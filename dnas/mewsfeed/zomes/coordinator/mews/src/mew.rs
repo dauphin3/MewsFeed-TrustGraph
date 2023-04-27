@@ -6,6 +6,8 @@ use crate::mew_to_responses::*;
 use hdk::prelude::*;
 use mews_integrity::*;
 use regex::Regex;
+use hdk_time_indexing::index_hash;
+use chrono::{DateTime, NaiveDateTime, Utc};
 
 #[hdk_extern]
 pub fn create_mew(mew: Mew) -> ExternResult<Record> {
@@ -13,16 +15,15 @@ pub fn create_mew(mew: Mew) -> ExternResult<Record> {
     let record = get(mew_hash.clone(), GetOptions::default())?.ok_or(wasm_error!(
         WasmErrorInner::Guest(String::from("Could not find the newly created Mew"))
     ))?;
-    let path = Path::from("all_mews");
-    create_link(
-        path.path_entry_hash()?,
-        mew_hash.clone(),
-        LinkTypes::AllMews,
-        (),
-    )?;
     let my_agent_pub_key = agent_info()?.agent_latest_pubkey;
     create_link(my_agent_pub_key, mew_hash.clone(), LinkTypes::AgentMews, ())?;
     add_tags_for_mew(mew.clone(), mew_hash.clone())?;
+
+    let (seconds, nanos) = record.action().timestamp().as_seconds_and_nanos();
+    let naive = NaiveDateTime::from_timestamp_opt(seconds, nanos).unwrap();
+    let datetime: DateTime<Utc> = DateTime::from_utc(naive, Utc);
+    index_hash(&MEW_TIME_INDEX_NAME.to_owned(), AnyLinkableHash::from(mew_hash.clone()), datetime)
+        .map_err(|_| wasm_error!(WasmErrorInner::Guest("Failed to add new mew hash to time index".into())))?;
 
     match mew.mew_type {
         MewType::Quote(base_original_mew_hash) => {
@@ -108,14 +109,6 @@ pub fn delete_mew(original_mew_hash: ActionHash) -> ExternResult<ActionHash> {
                 "Linked action must reference an entry"
             ))))?;
         remove_tags_for_mew(mew, original_mew_hash.clone())?;
-    }
-
-    let path_hash = Path::from("all_mews").path_entry_hash()?;
-    let links = get_links(path_hash, LinkTypes::AllMews, None)?;
-    for link in links {
-        if ActionHash::from(link.target.clone()).eq(&original_mew_hash) {
-            delete_link(link.create_link_hash)?;
-        }
     }
 
     let my_agent_pub_key = agent_info()?.agent_latest_pubkey;

@@ -10,8 +10,6 @@ pub mod dna_properties;
 pub use dna_properties::*;
 pub mod agent_mews;
 pub use agent_mews::*;
-pub mod all_mews;
-pub use all_mews::*;
 pub mod prefix_index_to_cashtags;
 pub use prefix_index_to_cashtags::*;
 pub mod prefix_index_to_hashtags;
@@ -21,7 +19,8 @@ use hdi::prelude::*;
 pub use mew::*;
 use prefix_index::{validate_create_link_prefix_index, validate_delete_link_prefix_index};
 
-pub const TAG_PREFIX_INDEX_NAME: &str = "prefix_index";
+pub const TAG_PREFIX_INDEX_NAME: &str = "tag_prefix_index";
+pub const MEW_TIME_INDEX_NAME: &str = "mew_time_index";
 
 #[derive(Serialize, Deserialize)]
 #[serde(tag = "type")]
@@ -34,7 +33,6 @@ pub enum EntryTypes {
 #[derive(Serialize, Deserialize)]
 #[hdk_link_types]
 pub enum LinkTypes {
-    AllMews,
     AgentMews,
     PrefixIndex,
     PrefixIndexToHashtags,
@@ -105,9 +103,6 @@ pub fn validate(op: Op) -> ExternResult<ValidateCallbackResult> {
             tag,
             action,
         } => match link_type {
-            LinkTypes::AllMews => {
-                validate_create_link_all_mews(action, base_address, target_address, tag)
-            }
             LinkTypes::AgentMews => {
                 validate_create_link_agent_mews(action, base_address, target_address, tag)
             }
@@ -151,13 +146,6 @@ pub fn validate(op: Op) -> ExternResult<ValidateCallbackResult> {
             original_action,
             action,
         } => match link_type {
-            LinkTypes::AllMews => validate_delete_link_all_mews(
-                action,
-                original_action,
-                base_address,
-                target_address,
-                tag,
-            ),
             LinkTypes::AgentMews => validate_delete_link_agent_mews(
                 action,
                 original_action,
@@ -334,9 +322,6 @@ pub fn validate(op: Op) -> ExternResult<ValidateCallbackResult> {
                 link_type,
                 action,
             } => match link_type {
-                LinkTypes::AllMews => {
-                    validate_create_link_all_mews(action, base_address, target_address, tag)
-                }
                 LinkTypes::AgentMews => {
                     validate_create_link_agent_mews(action, base_address, target_address, tag)
                 }
@@ -394,13 +379,6 @@ pub fn validate(op: Op) -> ExternResult<ValidateCallbackResult> {
                         }
                     };
                 match link_type {
-                    LinkTypes::AllMews => validate_delete_link_all_mews(
-                        action,
-                        create_link.clone(),
-                        base_address,
-                        create_link.target_address,
-                        create_link.tag,
-                    ),
                     LinkTypes::AgentMews => validate_delete_link_agent_mews(
                         action,
                         create_link.clone(),

@@ -214,15 +214,17 @@ checksum = "baf1de4339761588bc0619e3cbc0120ee582ebb74b53b4efbf79117bd2da40fd"
 
 [[package]]
 name = "chrono"
-version = "0.4.23"
+version = "0.4.24"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "16b0a3d9ed01224b22057780a37bb8c5dbfe1be8ba48678e7bf57ec4b385411f"
+checksum = "4e3c5919066adf22df73762e50cffcde3a758f2a848b113b586d1f86728b673b"
 dependencies = [
  "iana-time-zone",
+ "js-sys",
  "num-integer",
  "num-traits",
  "serde",
  "time",
+ "wasm-bindgen",
  "winapi",
 ]
 
@@ -761,6 +763,28 @@ dependencies = [
 ]
 
 [[package]]
+name = "hdk_semantic_indexes_core"
+version = "0.1.0"
+source = "git+https://github.com/mattyg/hREA?branch=refactor/time-indexing-for-anylinkablehash#0d65714c615583b6382d7eb6d730ffc08f30bf0b"
+dependencies = [
+ "hdi",
+ "serde",
+]
+
+[[package]]
+name = "hdk_time_indexing"
+version = "0.1.0"
+source = "git+https://github.com/mattyg/hREA?branch=refactor/time-indexing-for-anylinkablehash#0d65714c615583b6382d7eb6d730ffc08f30bf0b"
+dependencies = [
+ "chrono",
+ "hdk",
+ "hdk_semantic_indexes_core",
+ "lazy_static",
+ "serde",
+ "thiserror",
+]
+
+[[package]]
 name = "heck"
 version = "0.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1136,7 +1160,9 @@ dependencies = [
 name = "mews"
 version = "0.0.1"
 dependencies = [
+ "chrono",
  "hdk",
+ "hdk_time_indexing",
  "mews_integrity",
  "prefix_index",
  "regex",
