@@ -1,0 +1,20 @@
+[package]
+name = "hdk_time_indexing"
+version = "0.1.0"
+authors = ["pospi <pospi@spadgos.com>"]
+edition = "2018"
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+name = "hdk_time_indexing"
+
+[dependencies]
+hdk = { workspace = true }
+holochain_integrity_types = { workspace = true }
+lazy_static = "=1.4.0"
+thiserror = "1.0"
+chrono = "0.4.24"
+serde = "1"
+
+[features]
+internal-testing = []

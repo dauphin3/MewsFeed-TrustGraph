@@ -3,11 +3,11 @@ use crate::hashtag_to_mews::*;
 use crate::licker_to_mews::*;
 use crate::mention_to_mews::*;
 use crate::mew_to_responses::*;
+use chrono::{DateTime, NaiveDateTime, Utc};
 use hdk::prelude::*;
+use hdk_time_indexing::index_hash;
 use mews_integrity::*;
 use regex::Regex;
-use hdk_time_indexing::index_hash;
-use chrono::{DateTime, NaiveDateTime, Utc};
 
 #[hdk_extern]
 pub fn create_mew(mew: Mew) -> ExternResult<Record> {
@@ -22,8 +22,17 @@ pub fn create_mew(mew: Mew) -> ExternResult<Record> {
     let (seconds, nanos) = record.action().timestamp().as_seconds_and_nanos();
     let naive = NaiveDateTime::from_timestamp_opt(seconds, nanos).unwrap();
     let datetime: DateTime<Utc> = DateTime::from_utc(naive, Utc);
-    index_hash(&MEW_TIME_INDEX_NAME.to_owned(), AnyLinkableHash::from(mew_hash.clone()), datetime)
-        .map_err(|_| wasm_error!(WasmErrorInner::Guest("Failed to add new mew hash to time index".into())))?;
+    index_hash(
+        &MEW_TIME_INDEX_NAME.to_owned(),
+        LinkTypes::MewTimeIndex,
+        AnyLinkableHash::from(mew_hash.clone()),
+        datetime,
+    )
+    .map_err(|_| {
+        wasm_error!(WasmErrorInner::Guest(
+            "Failed to add new mew hash to time index".into()
+        ))
+    })?;
 
     match mew.mew_type {
         MewType::Quote(base_original_mew_hash) => {

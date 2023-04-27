@@ -12,3 +12,4 @@ hdi = { workspace = true }
 hdk = { workspace = true }
 serde = { workspace = true }
 prefix_index = { workspace = true }
+hdk_time_indexing = { workspace = true }

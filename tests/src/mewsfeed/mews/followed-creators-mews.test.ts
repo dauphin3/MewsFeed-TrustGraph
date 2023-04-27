@@ -25,8 +25,8 @@ test("create a Mew and get followed creators mews", async () => {
       // Bob gets all mews
       let collectionOutput: Record[] = await bob.cells[0].callZome({
         zome_name: "mews",
-        fn_name: "get_all_mews",
-        payload: null,
+        fn_name: "get_latest_mews",
+        payload: 5,
       });
       assert.equal(collectionOutput.length, 0);
 
@@ -39,7 +39,7 @@ test("create a Mew and get followed creators mews", async () => {
       // Bob gets all mews again
       collectionOutput = await bob.cells[0].callZome({
         zome_name: "mews",
-        fn_name: "get_all_mews",
+        fn_name: "get_latest_mews",
         payload: null,
       });
       assert.equal(collectionOutput.length, 1);

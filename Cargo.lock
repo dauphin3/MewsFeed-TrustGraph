@@ -763,22 +763,12 @@ dependencies = [
 ]
 
 [[package]]
-name = "hdk_semantic_indexes_core"
-version = "0.1.0"
-source = "git+https://github.com/mattyg/hREA?branch=refactor/time-indexing-for-anylinkablehash#0d65714c615583b6382d7eb6d730ffc08f30bf0b"
-dependencies = [
- "hdi",
- "serde",
-]
-
-[[package]]
 name = "hdk_time_indexing"
 version = "0.1.0"
-source = "git+https://github.com/mattyg/hREA?branch=refactor/time-indexing-for-anylinkablehash#0d65714c615583b6382d7eb6d730ffc08f30bf0b"
 dependencies = [
  "chrono",
  "hdk",
- "hdk_semantic_indexes_core",
+ "holochain_integrity_types",
  "lazy_static",
  "serde",
  "thiserror",
@@ -1175,6 +1165,7 @@ version = "0.0.1"
 dependencies = [
  "hdi",
  "hdk",
+ "hdk_time_indexing",
  "prefix_index",
  "serde",
 ]

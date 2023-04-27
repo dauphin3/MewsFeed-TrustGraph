@@ -45,7 +45,11 @@ export const mewsfeedAppBundleSource: AppBundleSource =
     mew_characters_min: 5,
     mew_characters_max: 200,
     prefix_index_width: 3,
+    time_index_chunk_interval_ms: 30000,
   });
 
 export const mewsfeedAppBundleSourceNoLengthLimits: AppBundleSource =
-  createMewsFeedAppBundleSource();
+  createMewsFeedAppBundleSource({
+    prefix_index_width: 3,
+    time_index_chunk_interval_ms: 30000,
+  });

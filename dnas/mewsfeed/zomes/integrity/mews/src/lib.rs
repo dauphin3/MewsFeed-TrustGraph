@@ -18,6 +18,7 @@ pub mod mew;
 use hdi::prelude::*;
 pub use mew::*;
 use prefix_index::{validate_create_link_prefix_index, validate_delete_link_prefix_index};
+use hdk_time_indexing::{validate_create_link_time_index, validate_delete_link_time_index};
 
 pub const TAG_PREFIX_INDEX_NAME: &str = "tag_prefix_index";
 pub const MEW_TIME_INDEX_NAME: &str = "mew_time_index";
@@ -35,6 +36,7 @@ pub enum EntryTypes {
 pub enum LinkTypes {
     AgentMews,
     PrefixIndex,
+    MewTimeIndex,
     PrefixIndexToHashtags,
     PrefixIndexToCashtags,
     MewToResponses,
@@ -113,6 +115,13 @@ pub fn validate(op: Op) -> ExternResult<ValidateCallbackResult> {
                 tag,
                 TAG_PREFIX_INDEX_NAME,
             ),
+            LinkTypes::MewTimeIndex => validate_create_link_time_index(
+                action,
+                base_address,
+                target_address,
+                tag,
+                MEW_TIME_INDEX_NAME,
+            ),
             LinkTypes::PrefixIndexToHashtags => validate_create_link_prefix_index_to_hashtags(
                 action,
                 base_address,
@@ -154,6 +163,13 @@ pub fn validate(op: Op) -> ExternResult<ValidateCallbackResult> {
                 tag,
             ),
             LinkTypes::PrefixIndex => validate_delete_link_prefix_index(
+                action,
+                original_action,
+                base_address,
+                target_address,
+                tag,
+            ),
+            LinkTypes::MewTimeIndex => validate_delete_link_time_index(
                 action,
                 original_action,
                 base_address,
@@ -332,6 +348,13 @@ pub fn validate(op: Op) -> ExternResult<ValidateCallbackResult> {
                     tag,
                     TAG_PREFIX_INDEX_NAME,
                 ),
+                LinkTypes::MewTimeIndex => validate_create_link_time_index(
+                    action,
+                    base_address,
+                    target_address,
+                    tag,
+                    MEW_TIME_INDEX_NAME,
+                ),
                 LinkTypes::PrefixIndexToHashtags => validate_create_link_prefix_index_to_hashtags(
                     action,
                     base_address,
@@ -387,6 +410,13 @@ pub fn validate(op: Op) -> ExternResult<ValidateCallbackResult> {
                         create_link.tag,
                     ),
                     LinkTypes::PrefixIndex => validate_delete_link_prefix_index(
+                        action,
+                        create_link.clone(),
+                        base_address,
+                        create_link.target_address,
+                        create_link.tag,
+                    ),
+                    LinkTypes::MewTimeIndex => validate_delete_link_time_index(
                         action,
                         create_link.clone(),
                         base_address,
