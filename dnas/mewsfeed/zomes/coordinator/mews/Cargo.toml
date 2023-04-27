@@ -14,4 +14,4 @@ regex = "1"
 mews_integrity = { workspace = true } 
 prefix_index = { workspace = true }
 hdk_time_indexing = { workspace = true }
-chrono = "=0.4.24"
+chrono = { version = "0.4.22", default-features = false, features = ["clock", "std", "oldtime", "serde"] }
