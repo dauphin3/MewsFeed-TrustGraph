@@ -1,13 +1,6 @@
 <template>
   <QPage :style-fn="pageHeightCorrection">
-    <QBtn flat @click="router.back()">
-      <QIcon
-        name="arrow_right_alt"
-        size="lg"
-        style="transform: rotate(180deg); font-weight: 100"
-      />
-      Back
-    </QBtn>
+    <BaseButtonBack />
     <h6 class="q-mt-md q-mb-md">Notifications</h6>
 
     <QInfiniteScroll
@@ -68,28 +61,22 @@
 <script setup lang="ts">
 import { AppAgentClient } from "@holochain/client";
 import { inject, ComputedRef, watch, toRaw } from "vue";
-import {
-  QPage,
-  QInfiniteScroll,
-  QSpinnerDots,
-  QIcon,
-  QList,
-  QBtn,
-} from "quasar";
+import { QPage, QInfiniteScroll, QSpinnerDots, QIcon, QList } from "quasar";
+import { onBeforeRouteLeave } from "vue-router";
 import { pageHeightCorrection } from "@/utils/page-layout";
 import BaseNotification from "@/components/BaseNotification.vue";
 import BaseEmptyMewsFeed from "@/components/BaseEmptyMewsFeed.vue";
 import BaseMewListSkeleton from "@/components/BaseMewListSkeleton.vue";
 import { showError } from "@/utils/toasts";
-import { useInfiniteQuery } from "@tanstack/vue-query";
+import { useInfiniteQuery, useQueryClient } from "@tanstack/vue-query";
 import { makeUseNotificationsReadStore } from "@/stores/notificationsRead";
 import { PaginationDirectionName, Notification } from "@/types/types";
-import { useRouter } from "vue-router";
+import BaseButtonBack from "@/components/BaseButtonBack.vue";
 
-const router = useRouter();
 const client = (inject("client") as ComputedRef<AppAgentClient>).value;
 const useNotificationsReadStore = makeUseNotificationsReadStore(client);
 const { markRead, addNotificationStatus } = useNotificationsReadStore();
+const queryClient = useQueryClient();
 
 const pageLimit = 10;
 
@@ -132,4 +119,16 @@ const fetchNextPageInfiniteScroll = async (
   await fetchNextPage();
   done(!hasNextPage?.value);
 };
+
+onBeforeRouteLeave(() => {
+  if (data.value && data.value.pages.length > 1) {
+    queryClient.setQueryData(
+      ["mews", "get_notifications_for_agent", client.myPubKey],
+      (d: any) => ({
+        pages: [d.pages[0]],
+        pageParams: [d.pageParams[0]],
+      })
+    );
+  }
+});
 </script>

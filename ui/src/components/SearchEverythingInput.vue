@@ -4,6 +4,7 @@
       <div class="q-pa-md row" style="background: rgba(255, 255, 255, 0.075)">
         <QIcon name="search" color="white" size="sm" class="q-mr-sm" />
         <ComboboxInput
+          id="searcheverythinginput"
           style="
             background-color: transparent;
             border: none;
@@ -20,7 +21,7 @@
         leave="transition ease-in duration-100"
         leave-from="opacity-100"
         leave-to="opacity-0"
-        style="width: 100%; position: relative;"
+        style="width: 100%; position: relative"
         @after-leave="query = ''"
       >
         <ComboboxOptions
@@ -55,15 +56,15 @@
             <ComboboxOption
               v-for="(item, i) in results"
               :key="i"
-              v-slot="{ selected, active }"
+              v-slot="{ active }"
               as="template"
               :value="item"
             >
               <QItem
                 v-if="item.resultType === SearchResult.Agent"
+                :focused="active"
+                manual-focus
                 clickable
-                :active="active"
-                :focused="selected"
                 dense
                 class="q-py-sm"
               >
@@ -82,9 +83,9 @@
               </QItem>
               <QItem
                 v-else-if="item.resultType === SearchResult.Hashtag"
+                :focused="active"
+                manual-focus
                 clickable
-                :active="active"
-                :focused="selected"
                 dense
                 class="q-py-sm"
               >
@@ -94,9 +95,9 @@
               </QItem>
               <QItem
                 v-else-if="item.resultType === SearchResult.Cashtag"
+                :focused="active"
+                manual-focus
                 clickable
-                :active="active"
-                :focused="selected"
                 dense
                 class="q-py-sm"
               >
@@ -219,3 +220,29 @@ watch(selection, (result: any) => {
   }
 });
 </script>
+<style scoped>
+#searcheverythinginput::placeholder {
+  color: white;
+}
+#searcheverythinginput::-webkit-input-placeholder {
+  color: white;
+}
+#searcheverythinginput:-moz-placeholder {
+  /* FF 4-18 */
+  color: white;
+  opacity: 1;
+}
+#searcheverythinginput::-moz-placeholder {
+  /* FF 19+ */
+  color: white;
+  opacity: 1;
+}
+#searcheverythinginput:-ms-input-placeholder {
+  /* IE 10+ */
+  color: white;
+}
+#searcheverythinginput::-ms-input-placeholder {
+  /* Microsoft Edge */
+  color: white;
+}
+</style>

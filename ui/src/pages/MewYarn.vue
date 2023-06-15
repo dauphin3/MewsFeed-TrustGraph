@@ -2,14 +2,7 @@
   <QPage :style-fn="pageHeightCorrection">
     <QCard flat>
       <QCardSection class="q-pb-none">
-        <QBtn flat @click="router.back()">
-          <QIcon
-            name="arrow_right_alt"
-            size="lg"
-            style="transform: rotate(180deg); font-weight: 100"
-          />
-          Back
-        </QBtn>
+        <BaseButtonBack />
       </QCardSection>
 
       <QCardSection class="yarn-container">
@@ -91,7 +84,6 @@ import {
   QSpinnerDots,
   QCard,
   QCardSection,
-  QBtn,
   QIcon,
   QItem,
   QList,
@@ -103,15 +95,19 @@ import { MewTypeName, PaginationDirectionName } from "@/types/types";
 import { pageHeightCorrection } from "@/utils/page-layout";
 import { decodeHashFromBase64 } from "@holochain/client";
 import { ComputedRef, computed, inject, watch } from "vue";
-import { useRoute, useRouter } from "vue-router";
+import { useRoute, onBeforeRouteLeave } from "vue-router";
 import { AppAgentClient } from "@holochain/client";
 import { showError } from "@/utils/toasts";
-import { useInfiniteQuery, useQuery } from "@tanstack/vue-query";
-import { encodeHashToBase64 } from "@holochain/client";
+import {
+  useInfiniteQuery,
+  useQuery,
+  useQueryClient,
+} from "@tanstack/vue-query";
+import BaseButtonBack from "@/components/BaseButtonBack.vue";
 
 const client = (inject("client") as ComputedRef<AppAgentClient>).value;
 const route = useRoute();
-const router = useRouter();
+const queryClient = useQueryClient();
 
 const pageLimit = 10;
 
@@ -221,4 +217,20 @@ const refetchMewAndRepliesLastPage = async () => {
     await fetchNextPage();
   }
 };
+
+onBeforeRouteLeave(() => {
+  if (replies.value && replies.value.pages.length > 1) {
+    queryClient.setQueryData(
+      [
+        "mews",
+        "get_responses_for_mew_with_context",
+        route.params.actionHash as string,
+      ],
+      (d: any) => ({
+        pages: [d.pages[0]],
+        pageParams: [d.pageParams[0]],
+      })
+    );
+  }
+});
 </script>
