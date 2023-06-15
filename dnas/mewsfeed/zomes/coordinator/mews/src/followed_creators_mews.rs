@@ -59,7 +59,13 @@ fn get_followed_creators_mew_hashes(
 
     let hashes: Vec<ActionHash> = links_page
         .into_iter()
-        .map(|link| ActionHash::try_from(link.target).map_err(|_| wasm_error!(WasmErrorInner::Guest("Failed to convert link target to ActionHash".into()))))
+        .map(|link| {
+            ActionHash::try_from(link.target).map_err(|_| {
+                wasm_error!(WasmErrorInner::Guest(
+                    "Failed to convert link target to ActionHash".into()
+                ))
+            })
+        })
         .collect::<ExternResult<Vec<ActionHash>>>()?;
 
     Ok(hashes)

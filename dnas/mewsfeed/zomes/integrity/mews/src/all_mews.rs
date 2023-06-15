@@ -7,8 +7,11 @@ pub fn validate_create_link_all_mews(
     target_address: AnyLinkableHash,
     _tag: LinkTag,
 ) -> ExternResult<ValidateCallbackResult> {
-    let action_hash = ActionHash::try_from(target_address.clone())
-        .map_err(|_| wasm_error!(WasmErrorInner::Guest("Failed to convert link target to ActionHash".into())))?;
+    let action_hash = ActionHash::try_from(target_address).map_err(|_| {
+        wasm_error!(WasmErrorInner::Guest(
+            "Failed to convert link target to ActionHash".into()
+        ))
+    })?;
     let record = must_get_valid_record(action_hash)?;
     let _mew: crate::Mew = record
         .entry()
@@ -19,8 +22,11 @@ pub fn validate_create_link_all_mews(
         ))))?;
 
     let expected_base_address = Path::from("all_mews").path_entry_hash()?;
-    let entry_hash = EntryHash::try_from(base_address.clone())
-        .map_err(|_| wasm_error!(WasmErrorInner::Guest("Failed to convert link base to EntryHash".into())))?;
+    let entry_hash = EntryHash::try_from(base_address).map_err(|_| {
+        wasm_error!(WasmErrorInner::Guest(
+            "Failed to convert link base to EntryHash".into()
+        ))
+    })?;
     if entry_hash != expected_base_address {
         return Ok(ValidateCallbackResult::Invalid(
             "AllMews link must use 'all_mews' Path as its base".into(),

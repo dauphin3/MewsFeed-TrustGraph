@@ -30,7 +30,13 @@ pub fn get_creators_for_follower(
 
     let agents: Vec<AgentPubKey> = links_page
         .into_iter()
-        .map(|link| AgentPubKey::try_from(link.target).map_err(|_| wasm_error!(WasmErrorInner::Guest("Failed to convert link target to AgentPubKey".into()))))
+        .map(|link| {
+            AgentPubKey::try_from(link.target).map_err(|_| {
+                wasm_error!(WasmErrorInner::Guest(
+                    "Failed to convert link target to AgentPubKey".into()
+                ))
+            })
+        })
         .collect::<ExternResult<Vec<AgentPubKey>>>()?;
 
     Ok(agents)
@@ -44,7 +50,13 @@ pub fn get_followers_for_creator(
 
     let agents: Vec<AgentPubKey> = links
         .into_iter()
-        .map(|link| AgentPubKey::try_from(link.target).map_err(|_| wasm_error!(WasmErrorInner::Guest("Failed to convert link target to AgentPubKey".into()))))
+        .map(|link| {
+            AgentPubKey::try_from(link.target).map_err(|_| {
+                wasm_error!(WasmErrorInner::Guest(
+                    "Failed to convert link target to AgentPubKey".into()
+                ))
+            })
+        })
         .collect::<ExternResult<Vec<AgentPubKey>>>()?;
 
     Ok(agents)
@@ -77,8 +89,11 @@ pub fn remove_creator_for_follower(input: RemoveCreatorForFollowerInput) -> Exte
     )?;
 
     for link in links {
-        let agentpubkey = AgentPubKey::try_from(link.target.clone())
-            .map_err(|_| wasm_error!(WasmErrorInner::Guest("Failed to convert link target to AgentPubKey".into())))?;
+        let agentpubkey = AgentPubKey::try_from(link.target.clone()).map_err(|_| {
+            wasm_error!(WasmErrorInner::Guest(
+                "Failed to convert link target to AgentPubKey".into()
+            ))
+        })?;
         if agentpubkey == input.target_creator {
             delete_link(link.create_link_hash)?;
         }
@@ -91,10 +106,13 @@ pub fn remove_creator_for_follower(input: RemoveCreatorForFollowerInput) -> Exte
     )?;
 
     for link in links {
-        let agentpubkey = AgentPubKey::try_from(link.target.clone())
-            .map_err(|_| wasm_error!(WasmErrorInner::Guest("Failed to convert link target to AgentPubKey".into())))?;
-    
-        if agentpubkey  == input.base_follower {
+        let agentpubkey = AgentPubKey::try_from(link.target.clone()).map_err(|_| {
+            wasm_error!(WasmErrorInner::Guest(
+                "Failed to convert link target to AgentPubKey".into()
+            ))
+        })?;
+
+        if agentpubkey == input.base_follower {
             delete_link(link.create_link_hash)?;
         }
     }

@@ -33,7 +33,13 @@ fn get_agent_mew_hashes(input: GetAgentMewsInput) -> ExternResult<Vec<ActionHash
 
     let hashes: Vec<ActionHash> = links_slice
         .into_iter()
-        .map(|link| ActionHash::try_from(link.target).map_err(|_| wasm_error!(WasmErrorInner::Guest("Failed to convert link base to EntryHash".into()))))
+        .map(|link| {
+            ActionHash::try_from(link.target).map_err(|_| {
+                wasm_error!(WasmErrorInner::Guest(
+                    "Failed to convert link base to EntryHash".into()
+                ))
+            })
+        })
         .collect::<ExternResult<Vec<ActionHash>>>()?;
 
     Ok(hashes)

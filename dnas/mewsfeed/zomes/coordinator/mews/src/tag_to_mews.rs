@@ -16,7 +16,13 @@ pub fn get_mew_hashes_for_tag(
     let links_page = paginate_by_hash(links, page)?;
     let hashes: Vec<ActionHash> = links_page
         .iter()
-        .map(|link| ActionHash::try_from(link.target.clone()).map_err(|_| wasm_error!(WasmErrorInner::Guest("Failed to convert link target to ActionHash".into()))))
+        .map(|link| {
+            ActionHash::try_from(link.target.clone()).map_err(|_| {
+                wasm_error!(WasmErrorInner::Guest(
+                    "Failed to convert link target to ActionHash".into()
+                ))
+            })
+        })
         .collect::<ExternResult<Vec<ActionHash>>>()?;
 
     Ok(hashes)

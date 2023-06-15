@@ -52,7 +52,13 @@ pub fn get_response_hashes_for_mew(
     let links_page = paginate_by_hash(links, input.page)?;
     let hashes: Vec<ActionHash> = links_page
         .into_iter()
-        .map(|link| ActionHash::try_from(link.target).map_err(|_| wasm_error!(WasmErrorInner::Guest("Failed to convert link target to ActionHash".into()))))
+        .map(|link| {
+            ActionHash::try_from(link.target).map_err(|_| {
+                wasm_error!(WasmErrorInner::Guest(
+                    "Failed to convert link target to ActionHash".into()
+                ))
+            })
+        })
         .collect::<ExternResult<Vec<ActionHash>>>()?;
 
     Ok(hashes)
@@ -86,8 +92,11 @@ pub fn remove_response_for_mew(input: RemoveResponseForMewInput) -> ExternResult
         None,
     )?;
     for link in links {
-        let action_hash = ActionHash::try_from(link.target.clone())
-            .map_err(|_| wasm_error!(WasmErrorInner::Guest("Failed to convert link target to ActionHash".into())))?;
+        let action_hash = ActionHash::try_from(link.target.clone()).map_err(|_| {
+            wasm_error!(WasmErrorInner::Guest(
+                "Failed to convert link target to ActionHash".into()
+            ))
+        })?;
         if action_hash == input.target_response_mew_hash {
             delete_link(link.create_link_hash)?;
         }

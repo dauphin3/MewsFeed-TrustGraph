@@ -77,8 +77,11 @@ pub fn delete_mew(original_mew_hash: ActionHash) -> ExternResult<ActionHash> {
     let path_hash = Path::from("all_mews").path_entry_hash()?;
     let links = get_links(path_hash, LinkTypes::AllMews, None)?;
     for link in links {
-        let action_hash = ActionHash::try_from(link.target.clone())
-            .map_err(|_| wasm_error!(WasmErrorInner::Guest("Failed to convert link target to ActionHash".into())))?;
+        let action_hash = ActionHash::try_from(link.target.clone()).map_err(|_| {
+            wasm_error!(WasmErrorInner::Guest(
+                "Failed to convert link target to ActionHash".into()
+            ))
+        })?;
         if action_hash == original_mew_hash {
             delete_link(link.create_link_hash)?;
         }
@@ -87,8 +90,11 @@ pub fn delete_mew(original_mew_hash: ActionHash) -> ExternResult<ActionHash> {
     let my_agent_pub_key = agent_info()?.agent_latest_pubkey;
     let links = get_links(my_agent_pub_key, LinkTypes::AgentMews, None)?;
     for link in links {
-        let action_hash = ActionHash::try_from(link.target.clone())
-            .map_err(|_| wasm_error!(WasmErrorInner::Guest("Failed to convert link target to ActionHash".into())))?;
+        let action_hash = ActionHash::try_from(link.target.clone()).map_err(|_| {
+            wasm_error!(WasmErrorInner::Guest(
+                "Failed to convert link target to ActionHash".into()
+            ))
+        })?;
         if action_hash == original_mew_hash {
             delete_link(link.create_link_hash)?;
         }
@@ -96,8 +102,11 @@ pub fn delete_mew(original_mew_hash: ActionHash) -> ExternResult<ActionHash> {
 
     let links = get_links(original_mew_hash.clone(), LinkTypes::MewToResponses, None)?;
     for link in links {
-        let action_hash = ActionHash::try_from(link.target.clone())
-            .map_err(|_| wasm_error!(WasmErrorInner::Guest("Failed to convert link target to ActionHash".into())))?;
+        let action_hash = ActionHash::try_from(link.target.clone()).map_err(|_| {
+            wasm_error!(WasmErrorInner::Guest(
+                "Failed to convert link target to ActionHash".into()
+            ))
+        })?;
         if action_hash == original_mew_hash {
             delete_link(link.create_link_hash)?;
         }

@@ -43,8 +43,11 @@ pub fn remove_cashtag_for_mew(input: RemoveCashtagForMewInput) -> ExternResult<(
         Some(LinkTag(input.base_cashtag.as_bytes().to_vec())),
     )?;
     for link in links {
-        let action_hash = ActionHash::try_from(link.target.clone())
-            .map_err(|_| wasm_error!(WasmErrorInner::Guest("Failed to convert link target to ActionHash".into())))?;
+        let action_hash = ActionHash::try_from(link.target.clone()).map_err(|_| {
+            wasm_error!(WasmErrorInner::Guest(
+                "Failed to convert link target to ActionHash".into()
+            ))
+        })?;
         if action_hash == input.target_mew_hash {
             delete_link(link.create_link_hash)?;
         }
