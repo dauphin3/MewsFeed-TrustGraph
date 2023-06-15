@@ -1,25 +1,29 @@
 {
+  description = "Flake for Holochain app development";
+
   inputs = {
-    holonix.url = "github:holochain/holochain";
-    holonix.inputs.versions.url = "github:holochain/holochain?dir=versions/0_1";
-    nixpkgs.follows = "holonix/nixpkgs";
+    versions.url = "github:holochain/holochain?dir=versions/0_2";
+    holochain-flake = {
+      url = "github:holochain/holochain";
+      inputs.versions.follows = "versions";
+    };
+
+    nixpkgs.follows = "holochain-flake/nixpkgs";
   };
 
-  outputs = inputs@{ holonix, ... }:
-    holonix.inputs.flake-parts.lib.mkFlake { inherit inputs; } {
-      # provide a dev shell for all systems that the holonix flake supports
-      systems = builtins.attrNames holonix.devShells;
-
-      perSystem = { config, system, pkgs, ... }:
-        {
-          devShells.default = pkgs.mkShell {
-            inputsFrom = [ holonix.devShells.${system}.holonix ];
-            packages = with pkgs; [
-              # add further packages from nixpkgs
-              cargo-watch
-              nodejs
-            ];
-          };
+  outputs = inputs @ { ... }:
+    inputs.holochain-flake.inputs.flake-parts.lib.mkFlake { inherit inputs; }
+    {
+        systems = builtins.attrNames inputs.holochain-flake.devShells;
+        perSystem = { config, pkgs, system, ... }: {
+            devShells.default = pkgs.mkShell {
+                inputsFrom = [
+                    inputs.holochain-flake.devShells.${system}.holonix
+                ];
+                packages = [
+                    pkgs.nodejs-18_x
+                ];
+            };
         };
     };
 }
