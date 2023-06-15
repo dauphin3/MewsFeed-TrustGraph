@@ -6,7 +6,8 @@ pub fn validate_create_link_mew_to_responses(
     target_address: AnyLinkableHash,
     _tag: LinkTag,
 ) -> ExternResult<ValidateCallbackResult> {
-    let action_hash = ActionHash::from(base_address);
+    let action_hash = ActionHash::try_from(base_address.clone())
+        .map_err(|_: holo_hash::HashConversionError<holo_hash::hash_type::AnyLinkable, holo_hash::hash_type::Action>| wasm_error!(WasmErrorInner::Guest("Failed to convert link base to ActionHash".into())))?;
     let record = must_get_valid_record(action_hash)?;
     let _mew: crate::Mew = record
         .entry()
@@ -15,7 +16,8 @@ pub fn validate_create_link_mew_to_responses(
         .ok_or(wasm_error!(WasmErrorInner::Guest(String::from(
             "Linked action must reference an entry"
         ))))?;
-    let action_hash = ActionHash::from(target_address);
+    let action_hash = ActionHash::try_from(target_address.clone())
+        .map_err(|_| wasm_error!(WasmErrorInner::Guest("Failed to convert link target to ActionHash".into())))?;
     let record = must_get_valid_record(action_hash)?;
     let _mew: crate::Mew = record
         .entry()
@@ -49,7 +51,8 @@ pub fn validate_create_link_response_to_mews(
     target_address: AnyLinkableHash,
     _tag: LinkTag,
 ) -> ExternResult<ValidateCallbackResult> {
-    let action_hash = ActionHash::from(base_address);
+    let action_hash = ActionHash::try_from(base_address.clone())
+        .map_err(|_| wasm_error!(WasmErrorInner::Guest("Failed to convert link base to ActionHash".into())))?;
     let record = must_get_valid_record(action_hash)?;
     let _mew: crate::Mew = record
         .entry()
@@ -58,7 +61,8 @@ pub fn validate_create_link_response_to_mews(
         .ok_or(wasm_error!(WasmErrorInner::Guest(String::from(
             "Linked action must reference an entry"
         ))))?;
-    let action_hash = ActionHash::from(target_address);
+    let action_hash = ActionHash::try_from(target_address.clone())
+        .map_err(|_| wasm_error!(WasmErrorInner::Guest("Failed to convert link target to ActionHash".into())))?;    
     let record = must_get_valid_record(action_hash)?;
     let _mew: crate::Mew = record
         .entry()

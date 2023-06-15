@@ -73,7 +73,7 @@ where
     let wrapped_page = match page {
         Some(p) => match p.after_agentpubkey {
             Some(agentpubkey) => Some(HashPagination {
-                after_hash: Some(AnyLinkableHash::from(EntryHash::from(agentpubkey))),
+                after_hash: Some(AnyLinkableHash::try_from(agentpubkey)?),
                 direction: None,
                 limit: p.limit,
             }),

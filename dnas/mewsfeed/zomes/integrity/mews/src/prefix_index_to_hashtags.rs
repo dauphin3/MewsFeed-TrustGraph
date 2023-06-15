@@ -9,7 +9,8 @@ pub fn validate_create_link_prefix_index_to_hashtags(
     tag_prefix_index: PrefixIndex,
 ) -> ExternResult<ValidateCallbackResult> {
     // Target should be a Mew
-    let action_hash = ActionHash::from(target_address);
+    let action_hash = ActionHash::try_from(target_address.clone())
+        .map_err(|_| wasm_error!(WasmErrorInner::Guest("Failed to convert link target to ActionHash".into())))?;
     let record = must_get_valid_record(action_hash)?;
     let _mew: crate::Mew = record
         .entry()
@@ -31,7 +32,9 @@ pub fn validate_create_link_prefix_index_to_hashtags(
         .make_result_path(tag_string, None)?
         .path_entry_hash()?;
 
-    if EntryHash::from(base_address) != prefix_path_hash {
+    let entry_hash = EntryHash::try_from(base_address.clone())
+        .map_err(|_| wasm_error!(WasmErrorInner::Guest("Failed to convert link base to EntryHash".into())))?;
+    if entry_hash != prefix_path_hash {
         return Ok(ValidateCallbackResult::Invalid(format!(
             "PrefixIndexToHashtag base address should be '{:?}'",
             prefix_path_hash

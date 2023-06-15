@@ -16,8 +16,8 @@ pub fn get_mews_for_pinner_with_context(agent: AgentPubKey) -> ExternResult<Vec<
     )?;
     let pinned_action_hashes: Vec<ActionHash> = pinned_hashes
         .iter()
-        .map(|h| ActionHash::from(h.clone()))
-        .collect();
+        .map(|hash| ActionHash::try_from(hash.clone()).map_err(|_| wasm_error!(WasmErrorInner::Guest("Failed to convert hash to ActionHash".into()))))
+        .collect::<ExternResult<Vec<ActionHash>>>()?;
 
     get_batch_mews_with_context(pinned_action_hashes)
 }

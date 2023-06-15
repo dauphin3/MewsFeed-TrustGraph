@@ -28,8 +28,8 @@ pub fn get_all_mew_hashes() -> ExternResult<Vec<ActionHash>> {
     links.sort_by(|a, b| b.timestamp.cmp(&a.timestamp));
     let hashes: Vec<ActionHash> = links
         .into_iter()
-        .map(|link| ActionHash::from(link.target))
-        .collect();
+        .map(|link| ActionHash::try_from(link.target).map_err(|_| wasm_error!(WasmErrorInner::Guest("Failed to convert link target to ActionHash".into()))))
+        .collect::<ExternResult<Vec<ActionHash>>>()?;
 
     Ok(hashes)
 }

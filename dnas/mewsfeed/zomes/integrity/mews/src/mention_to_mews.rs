@@ -7,7 +7,8 @@ pub fn validate_create_link_mention_to_mews(
     _tag: LinkTag,
 ) -> ExternResult<ValidateCallbackResult> {
     // Check the entry type for the given action hash
-    let action_hash = ActionHash::from(target_address);
+    let action_hash = ActionHash::try_from(target_address.clone())
+        .map_err(|_| wasm_error!(WasmErrorInner::Guest("Failed to convert link target to ActionHash".into())))?;
     let record = must_get_valid_record(action_hash)?;
     let _mew: crate::Mew = record
         .entry()
@@ -17,7 +18,7 @@ pub fn validate_create_link_mention_to_mews(
             "Linked action must reference an entry"
         ))))?;
 
-    if AgentPubKey::try_from(EntryHash::from(base_address)).is_err() {
+    if AgentPubKey::try_from(base_address).is_err() {
         return Ok(ValidateCallbackResult::Invalid(
             "Base addesss of MentionToMew link must be an AgentPubKey".into(),
         ));

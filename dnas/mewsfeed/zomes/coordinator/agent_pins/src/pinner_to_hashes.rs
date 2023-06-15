@@ -39,8 +39,8 @@ pub fn get_pinners_for_hash(hash: AnyLinkableHash) -> ExternResult<Vec<AgentPubK
 
     let agents: Vec<AgentPubKey> = links
         .into_iter()
-        .map(|link| AgentPubKey::from(EntryHash::from(link.target)))
-        .collect();
+        .map(|link| AgentPubKey::try_from(link.target).map_err(|_| wasm_error!(WasmErrorInner::Guest("Failed to convert link target to AgentPubKey".into()))))
+        .collect::<ExternResult<Vec<AgentPubKey>>>()?;
 
     Ok(agents)
 }
@@ -76,9 +76,8 @@ pub fn remove_hash_for_pinner(input: RemoveHashForPinnerInput) -> ExternResult<(
     let links = get_links(input.target_hash.clone(), LinkTypes::HashToPinners, None)?;
 
     for link in links {
-        if link.target.eq(&AnyLinkableHash::from(EntryHash::from(
-            input.base_pinner.clone(),
-        ))) {
+        let agentpubkey = AgentPubKey::try_from(link.target).map_err(|_| wasm_error!(WasmErrorInner::Guest("Failed to convert link target to AgentPubKey".into())))?;
+        if agentpubkey == input.base_pinner {
             delete_link(link.create_link_hash)?;
         }
     }

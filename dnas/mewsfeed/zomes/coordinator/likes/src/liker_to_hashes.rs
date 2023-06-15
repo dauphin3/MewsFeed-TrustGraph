@@ -38,8 +38,8 @@ pub fn get_likers_for_hash(hash: AnyLinkableHash) -> ExternResult<Vec<AgentPubKe
     let links = get_liker_links_for_hash(hash)?;
     let agents: Vec<AgentPubKey> = links
         .into_iter()
-        .map(|link| AgentPubKey::from(EntryHash::from(link.target)))
-        .collect();
+        .map(|link| AgentPubKey::try_from(link.target).map_err(|e| wasm_error!(WasmErrorInner::Guest("Failed to convert link target to AgentPubKey".into()))))
+        .collect::<ExternResult<Vec<AgentPubKey>>>()?;
 
     Ok(agents)
 }
@@ -75,7 +75,9 @@ pub fn remove_hash_for_liker(input: RemoveHashForLikerInput) -> ExternResult<()>
     let links = get_links(input.target_hash.clone(), LinkTypes::HashToLikers, None)?;
 
     for link in links {
-        if AgentPubKey::from(EntryHash::from(link.target.clone())).eq(&input.base_liker) {
+        let agentpubkey = AgentPubKey::try_from(link.target.clone())
+            .map_err(|_| wasm_error!(WasmErrorInner::Guest("Failed to convert link target to AgentPubKey".into())))?;
+        if agentpubkey == input.base_liker {
             delete_link(link.create_link_hash)?;
         }
     }
