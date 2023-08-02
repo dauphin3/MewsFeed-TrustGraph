@@ -5,17 +5,19 @@
         v-if="contentPart.tagType !== undefined"
         :content-part="contentPart"
       />
-      <span v-else class="whitespace-pre-line pr-1">
+      <span v-else class="whitespace-pre-line">
         {{ contentPart.text }}
       </span>
     </template>
 
-    <span v-if="contentRequiresTruncation">
-      <span v-if="truncate">...</span>
-      <a @click.stop="truncate = !truncate">
-        Show {{ truncate ? "More" : "Less" }}
-      </a>
-    </span>
+    <template v-if="contentRequiresTruncation">
+      <span v-if="truncate"> ... </span>
+      <div class="inline-block flex justify-end">
+        <a class="btn btn-xs btn-ghost" @click.stop="truncate = !truncate">
+          Show {{ truncate ? "More" : "Less" }}
+        </a>
+      </div>
+    </template>
   </div>
 </template>
 
