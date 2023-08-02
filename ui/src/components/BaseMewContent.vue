@@ -5,9 +5,9 @@
         v-if="contentPart.tagType !== undefined"
         :content-part="contentPart"
       />
-      <div v-else class="inline-block whitespace-pre-line pr-1">
+      <span v-else class="whitespace-pre-line pr-1">
         {{ contentPart.text }}
-      </div>
+      </span>
     </template>
 
     <span v-if="contentRequiresTruncation">
